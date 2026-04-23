@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iron Whale Digital — Web Development Agency</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@400;700;900&family=Space+Mono:wght@400;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+    <style>
+        :root {
+            --black: #04080f;
+            --navy-deep: #060d1a;
+            --navy: #0a1628;
+            --navy-mid: #0f2040;
+            --navy-light: #163052;
+            --silver-dark: #8a9bb0;
+            --silver: #b8c5d4;
+            --silver-light: #dce5ec;
+            --white: #f0f4f8;
+            --accent: #4da6d6;
+            --accent-bright: #00ccff;
+            --accent-glow: rgba(77, 166, 214, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            background: var(--black);
+            color: var(--silver-light);
+            font-family: 'Raleway', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* ===================== NAV ===================== */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 1.5rem 4rem;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.4s ease;
+        }
+        nav.scrolled {
+            background: rgba(4, 8, 15, 0.96);
+            backdrop-filter: blur(20px);
+            padding: 1rem 4rem;
+            border-bottom: 1px solid rgba(184, 197, 212, 0.1);
+        }
+        .nav-logo {
+            display: flex; align-items: center; gap: 12px;
+            text-decoration: none;
+        }
+        .logo-mark { width: 42px; height: 42px; }
+        .logo-text {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem; letter-spacing: 0.15em; color: var(--white);
+        }
+        .logo-text span { color: var(--accent); }
+        .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+        .nav-links a {
+            color: var(--silver); text-decoration: none;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+            transition: color 0.3s; position: relative;
+        }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+            height: 1px; background: var(--accent);
+            transform: scaleX(0); transition: transform 0.3s;
+        }
+        .nav-links a:hover { color: var(--accent-bright); }
+        .nav-links a:hover::after { transform: scaleX(1); }
+        .nav-cta {
+            font-family: 'Space Mono', monospace; font-size: 0.7rem;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            padding: 0.6rem 1.5rem; border: 1px solid var(--accent);
+            color: var(--accent); text-decoration: none; transition: all 0.3s;
+        }
+        .nav-cta:hover { background: var(--accent); color: var(--black); }
+        .nav-hamburger {
+            display: none; flex-direction: column; gap: 5px;
+            cursor: pointer; padding: 5px;
+        }
+        .nav-hamburger span {
+            display: block; width: 24px; height: 1px;
+            background: var(--silver); transition: all 0.3s;
+        }
+
+        /* ===================== HERO ===================== */
+        #hero {
+            position: relative; height: 100vh; min-height: 700px;
+            display: flex; align-items: center; overflow: hidden;
+            background: #000;
+        }
+        #hills-canvas {
+            position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1;
+        }
+        #particle-canvas {
+            position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2;
+        }
+        .hero-gradient {
+            position: absolute; inset: 0; z-index: 3;
+            background:
+                radial-gradient(ellipse 55% 45% at 60% 35%, rgba(10,22,40,0.35) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 60% at 20% 75%, rgba(77,166,214,0.03) 0%, transparent 60%);
+        }
+        .hero-content {
+            position: relative; z-index: 4;
+            padding: 0 4rem; max-width: 860px;
+        }
+        .hero-eyebrow {
+            font-family: 'Space Mono', monospace; font-size: 0.75rem;
+            letter-spacing: 0.4em; color: var(--accent); text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            opacity: 0; animation: fadeInUp 0.8s 0.3s forwards;
+        }
+        .hero-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(3.5rem, 8vw, 8rem);
+            font-weight: 900; line-height: 0.95;
+            color: var(--white); margin-bottom: 1.5rem;
+            opacity: 0; animation: fadeInUp 0.8s 0.5s forwards;
+        }
+        .hero-title .line-2 {
+            color: transparent;
+            -webkit-text-stroke: 1px var(--silver);
+            display: block;
+        }
+        .hero-title .accent-word {
+            color: var(--accent-bright);
+            -webkit-text-stroke: 0;
+        }
+        .hero-sub {
+            font-weight: 300; font-size: 1.1rem; line-height: 1.7;
+            color: var(--silver); max-width: 500px; margin-bottom: 3rem;
+            opacity: 0; animation: fadeInUp 0.8s 0.7s forwards;
+        }
+        .hero-actions {
+            display: flex; gap: 1.5rem; align-items: center;
+            opacity: 0; animation: fadeInUp 0.8s 0.9s forwards;
+        }
+        .btn-primary {
+            font-family: 'Space Mono', monospace; font-size: 0.75rem;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            padding: 1rem 2.5rem; background: var(--accent);
+            color: var(--black); text-decoration: none; font-weight: 700;
+            transition: all 0.3s; position: relative; overflow: hidden;
+        }
+        .btn-primary::before {
+            content: ''; position: absolute; inset: 0;
+            background: var(--accent-bright);
+            transform: translateX(-100%); transition: transform 0.3s;
+        }
+        .btn-primary:hover::before { transform: translateX(0); }
+        .btn-primary span { position: relative; z-index: 1; }
+        .btn-secondary {
+            font-family: 'Space Mono', monospace; font-size: 0.75rem;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--silver); text-decoration: none;
+            display: flex; align-items: center; gap: 0.5rem; transition: color 0.3s;
+        }
+        .btn-secondary:hover { color: var(--white); }
+
+        /* Hero Whale */
+        .hero-whale {
+            position: absolute; right: -5%; top: 50%;
+            transform: translateY(-50%);
+            width: 55%; max-width: 750px;
+            z-index: 4;
+            opacity: 0; animation: whaleReveal 2.5s 1.2s forwards;
+        }
+
+        /* Scroll indicator */
+        .hero-scroll {
+            position: absolute; bottom: 2rem; left: 50%;
+            transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+            opacity: 0; animation: fadeIn 1s 1.8s forwards;
+        }
+        .scroll-text {
+            font-family: 'Space Mono', monospace; font-size: 0.6rem;
+            letter-spacing: 0.3em; color: var(--silver-dark); text-transform: uppercase;
+        }
+        .scroll-line {
+            width: 1px; height: 40px;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+            animation: scrollPulse 2s infinite;
+        }
+
+        /* ===================== SERVICES ===================== */
+        #services {
+            padding: 8rem 4rem;
+            background: var(--navy-deep); position: relative;
+        }
+        #services::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(to right, transparent, var(--accent), transparent);
+        }
+        .section-header { margin-bottom: 5rem; }
+        .section-label {
+            font-family: 'Space Mono', monospace; font-size: 0.7rem;
+            letter-spacing: 0.4em; color: var(--accent); text-transform: uppercase;
+            margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem;
+        }
+        .section-label::before {
+            content: ''; display: inline-block; width: 30px; height: 1px;
+            background: var(--accent);
+        }
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 700; color: var(--white); line-height: 1.1;
+        }
+        .services-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+        }
+        .service-card {
+            padding: 3rem 2.5rem;
+            background: rgba(10, 22, 40, 0.5);
+            border: 1px solid rgba(184, 197, 212, 0.08);
+            position: relative; cursor: default;
+            transition: all 0.4s; overflow: hidden;
+        }
+        .service-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(77,166,214,0.05) 0%, transparent 60%);
+            opacity: 0; transition: opacity 0.4s;
+        }
+        .service-card:hover {
+            border-color: rgba(77,166,214,0.3);
+            transform: translateY(-4px);
+        }
+        .service-card:hover::before { opacity: 1; }
+        .service-num {
+            font-family: 'Cinzel', serif; font-size: 4rem; font-weight: 900;
+            color: rgba(77,166,214,0.1); line-height: 1; margin-bottom: 1rem;
+            transition: color 0.4s;
+        }
+        .service-card:hover .service-num { color: rgba(77,166,214,0.25); }
+        .service-icon { width: 48px; height: 48px; margin-bottom: 1.5rem; color: var(--accent); }
+        .service-name {
+            font-family: 'Cinzel', serif; font-size: 1.05rem; font-weight: 700;
+            color: var(--silver-light); margin-bottom: 1rem; letter-spacing: 0.05em;
+        }
+        .service-desc {
+            font-size: 0.9rem; line-height: 1.7;
+            color: var(--silver-dark); font-weight: 300;
+        }
+
+        /* ===================== ABOUT ===================== */
+        #about {
+            padding: 8rem 4rem; background: var(--black);
+            display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center;
+        }
+        .about-visual { position: relative; }
+        .about-frame {
+            position: relative; aspect-ratio: 4/5;
+            background: var(--navy); overflow: hidden;
+        }
+        .about-frame::before {
+            content: ''; position: absolute; inset: 0;
+            background:
+                linear-gradient(135deg, rgba(77,166,214,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(0,204,255,0.04) 0%, transparent 60%);
+        }
+        .depth-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .about-stat-block {
+            position: absolute; bottom: -2rem; right: -2rem;
+            background: var(--navy-mid);
+            border: 1px solid rgba(184,197,212,0.15);
+            padding: 2rem; z-index: 2;
+        }
+        .stat-number {
+            font-family: 'Bebas Neue', sans-serif; font-size: 4rem;
+            color: var(--accent-bright); line-height: 1; letter-spacing: 0.05em;
+        }
+        .stat-label {
+            font-family: 'Space Mono', monospace; font-size: 0.65rem;
+            letter-spacing: 0.3em; color: var(--silver-dark);
+            text-transform: uppercase; margin-top: 0.3rem;
+        }
+        .about-corner {
+            position: absolute; top: 1.5rem; left: 1.5rem;
+            width: 40px; height: 40px;
+            border-top: 2px solid var(--accent); border-left: 2px solid var(--accent);
+        }
+        .about-quote {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+            font-weight: 400; color: var(--white); line-height: 1.5;
+            margin: 2rem 0; padding-left: 1.5rem;
+            border-left: 2px solid var(--accent);
+        }
+        .about-body {
+            font-size: 0.95rem; line-height: 1.8;
+            color: var(--silver); font-weight: 300; margin-bottom: 1.5rem;
+        }
+        .about-metrics {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+            margin-top: 3rem; padding-top: 3rem;
+            border-top: 1px solid rgba(184,197,212,0.1);
+        }
+        .metric-value {
+            font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem;
+            color: var(--silver-light); letter-spacing: 0.05em;
+        }
+        .metric-label {
+            font-family: 'Space Mono', monospace; font-size: 0.6rem;
+            letter-spacing: 0.2em; color: var(--silver-dark);
+            text-transform: uppercase; margin-top: 0.3rem;
+        }
+
+        /* ===================== PORTFOLIO ===================== */
+        #portfolio {
+            padding: 8rem 4rem; background: var(--navy-deep); position: relative;
+        }
+        #portfolio::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(to right, transparent, var(--silver-dark), transparent);
+        }
+        .portfolio-header {
+            display: flex; justify-content: space-between;
+            align-items: flex-end; margin-bottom: 4rem;
+        }
+        .portfolio-grid {
+            display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5rem;
+        }
+        .project-card {
+            position: relative; overflow: hidden;
+            cursor: pointer; background: var(--navy);
+        }
+        .project-card:nth-child(1) { grid-column: span 7; }
+        .project-card:nth-child(2) { grid-column: span 5; }
+        .project-card:nth-child(3) { grid-column: span 4; }
+        .project-card:nth-child(4) { grid-column: span 8; }
+        .project-bg { width: 100%; position: relative; overflow: hidden; }
+        .project-card:nth-child(1) .project-bg { padding-bottom: 55%; }
+        .project-card:nth-child(2) .project-bg { padding-bottom: 55%; }
+        .project-card:nth-child(3) .project-bg { padding-bottom: 90%; }
+        .project-card:nth-child(4) .project-bg { padding-bottom: 90%; }
+        .project-visual {
+            position: absolute; inset: 0; transition: transform 0.6s ease;
+        }
+        .project-card:hover .project-visual { transform: scale(1.04); }
+        .pv-1 { background: linear-gradient(135deg, #0a1628, #1a3a5c, #0d2040); }
+        .pv-2 { background: linear-gradient(225deg, #04080f, #0a1628, #163052); }
+        .pv-3 { background: linear-gradient(45deg, #060d1a, #0f2040, #0a1628); }
+        .pv-4 { background: linear-gradient(315deg, #0a1628, #04080f, #0d2040); }
+        .pv-1::after {
+            content: ''; position: absolute; top: -20%; right: -10%; width: 60%; height: 120%;
+            background: radial-gradient(circle, rgba(77,166,214,0.12) 0%, transparent 70%);
+        }
+        .pv-2::after {
+            content: ''; position: absolute; bottom: -20%; left: 10%; width: 80%; height: 100%;
+            background: radial-gradient(ellipse, rgba(184,197,212,0.08) 0%, transparent 70%);
+        }
+        .pv-3::after {
+            content: ''; position: absolute; top: 10%; left: -10%; width: 70%; height: 70%;
+            background: radial-gradient(circle, rgba(0,204,255,0.08) 0%, transparent 70%);
+        }
+        .pv-4::after {
+            content: ''; position: absolute; top: 20%; right: 20%; width: 50%; height: 60%;
+            background: radial-gradient(ellipse, rgba(77,166,214,0.1) 0%, transparent 70%);
+        }
+        .project-overlay {
+            position: absolute; inset: 0;
+            background: rgba(4, 8, 15, 0.65);
+            opacity: 0; transition: opacity 0.4s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .project-card:hover .project-overlay { opacity: 1; }
+        .project-info {
+            padding: 1.5rem; background: var(--navy-mid);
+            border-top: 1px solid rgba(184,197,212,0.1);
+        }
+        .project-tag {
+            font-family: 'Space Mono', monospace; font-size: 0.6rem;
+            letter-spacing: 0.3em; color: var(--accent);
+            text-transform: uppercase; margin-bottom: 0.5rem;
+        }
+        .project-name {
+            font-family: 'Cinzel', serif; font-size: 1rem;
+            color: var(--silver-light); font-weight: 600;
+        }
+
+        /* ===================== CONTACT ===================== */
+        #contact {
+            padding: 8rem 4rem; background: var(--black);
+            position: relative; overflow: hidden;
+        }
+        #contact::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(to right, transparent, var(--accent), transparent);
+        }
+        .contact-bg-text {
+            position: absolute; bottom: -5%; right: -2%;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(8rem, 15vw, 18rem);
+            color: rgba(184,197,212,0.02); letter-spacing: -0.02em;
+            pointer-events: none; line-height: 1;
+        }
+        .contact-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: start;
+        }
+        .contact-intro {
+            font-size: 0.95rem; line-height: 1.8;
+            color: var(--silver); font-weight: 300;
+            margin-top: 2rem; margin-bottom: 3rem;
+        }
+        .contact-detail {
+            display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;
+        }
+        .contact-detail-icon {
+            width: 40px; height: 40px; flex-shrink: 0;
+            border: 1px solid rgba(77,166,214,0.3);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--accent);
+        }
+        .contact-detail-label {
+            font-family: 'Space Mono', monospace; font-size: 0.6rem;
+            letter-spacing: 0.3em; color: var(--silver-dark);
+            text-transform: uppercase; margin-bottom: 0.2rem;
+        }
+        .contact-detail-text { font-size: 0.9rem; color: var(--silver); }
+        .contact-form { display: flex; flex-direction: column; gap: 1.5rem; }
+        .form-group { position: relative; }
+        .form-group label {
+            font-family: 'Space Mono', monospace; font-size: 0.65rem;
+            letter-spacing: 0.3em; color: var(--silver-dark);
+            text-transform: uppercase; display: block; margin-bottom: 0.5rem;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            background: rgba(10, 22, 40, 0.6);
+            border: 1px solid rgba(184,197,212,0.15);
+            color: var(--silver-light);
+            padding: 0.9rem 1rem;
+            font-family: 'Raleway', sans-serif; font-size: 0.9rem; font-weight: 300;
+            outline: none; transition: border-color 0.3s; -webkit-appearance: none;
+        }
+        .form-group select option { background: var(--navy-deep); }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus { border-color: var(--accent); }
+        .form-group textarea { resize: vertical; min-height: 120px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .btn-submit {
+            font-family: 'Space Mono', monospace; font-size: 0.75rem;
+            letter-spacing: 0.2em; text-transform: uppercase;
+            padding: 1.1rem 2.5rem;
+            background: transparent; border: 1px solid var(--accent);
+            color: var(--accent); cursor: pointer; transition: all 0.3s;
+            align-self: flex-start; position: relative; overflow: hidden;
+        }
+        .btn-submit::before {
+            content: ''; position: absolute; inset: 0;
+            background: var(--accent); transform: translateY(100%); transition: transform 0.3s;
+        }
+        .btn-submit:hover { color: var(--black); }
+        .btn-submit:hover::before { transform: translateY(0); }
+        .btn-submit span { position: relative; z-index: 1; }
+
+        /* ===================== FOOTER ===================== */
+        footer {
+            background: var(--navy-deep);
+            border-top: 1px solid rgba(184,197,212,0.08);
+            padding: 3rem 4rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .footer-logo {
+            font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem;
+            letter-spacing: 0.15em; color: var(--silver);
+        }
+        .footer-logo span { color: var(--accent); }
+        .footer-copy {
+            font-family: 'Space Mono', monospace; font-size: 0.65rem;
+            letter-spacing: 0.15em; color: var(--silver-dark);
+        }
+        .footer-links { display: flex; gap: 1.5rem; list-style: none; }
+        .footer-links a {
+            font-family: 'Space Mono', monospace; font-size: 0.65rem;
+            letter-spacing: 0.2em; color: var(--silver-dark);
+            text-decoration: none; text-transform: uppercase; transition: color 0.3s;
+        }
+        .footer-links a:hover { color: var(--accent); }
+
+        /* ===================== ANIMATIONS ===================== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes whaleReveal {
+            0%   { opacity: 0; transform: translateY(-50%) translateX(6%); }
+            100% { opacity: 0.3; transform: translateY(-50%) translateX(0); }
+        }
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 1; transform: scaleY(1); }
+            50%       { opacity: 0.3; transform: scaleY(0.6); }
+        }
+
+        /* ===================== SCROLL REVEAL ===================== */
+        .reveal {
+            opacity: 0; transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+        .reveal-delay-5 { transition-delay: 0.5s; }
+        .reveal-delay-6 { transition-delay: 0.6s; }
+
+        /* ===================== RESPONSIVE ===================== */
+        @media (max-width: 1024px) {
+            nav, nav.scrolled { padding: 1.2rem 2rem; }
+            .hero-content { padding: 0 2rem; }
+            .hero-whale { width: 60%; animation: whaleRevealSmall 2.5s 1.2s forwards; }
+            #services { padding: 5rem 2rem; }
+            .services-grid { grid-template-columns: repeat(2, 1fr); }
+            #about { padding: 5rem 2rem; gap: 3rem; }
+            #portfolio { padding: 5rem 2rem; }
+            .portfolio-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+            #contact { padding: 5rem 2rem; }
+            footer { padding: 2rem; }
+        }
+        @media (max-width: 768px) {
+            .nav-links, .nav-cta { display: none; }
+            .nav-hamburger { display: flex; }
+            .hero-whale { display: none; }
+            .services-grid { grid-template-columns: 1fr; }
+            #about { grid-template-columns: 1fr; }
+            .about-visual { display: none; }
+            .portfolio-grid { grid-template-columns: 1fr; }
+            .project-card { grid-column: span 1 !important; }
+            .project-card:nth-child(1) .project-bg,
+            .project-card:nth-child(2) .project-bg,
+            .project-card:nth-child(3) .project-bg,
+            .project-card:nth-child(4) .project-bg { padding-bottom: 60%; }
+            .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+            .form-row { grid-template-columns: 1fr; }
+            footer { flex-direction: column; gap: 1rem; text-align: center; }
+            .footer-links { justify-content: center; }
+        }
+        @keyframes whaleRevealSmall {
+            0%   { opacity: 0; }
+            100% { opacity: 0.15; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="main-nav">
+    <a href="#hero" class="nav-logo">
+        <svg class="logo-mark" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Geometric whale abstract mark -->
+            <path d="M6 30 L14 12 L21 22 L28 12 L36 30 L28 26 L21 34 L14 26 Z"
+                  fill="none" stroke="#4da6d6" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M21 22 L21 34" stroke="#4da6d6" stroke-width="1" opacity="0.5"/>
+            <circle cx="21" cy="21" r="2.5" fill="#4da6d6" opacity="0.8"/>
+            <path d="M14 26 L6 30" stroke="#4da6d6" stroke-width="1" opacity="0.4"/>
+            <path d="M28 26 L36 30" stroke="#4da6d6" stroke-width="1" opacity="0.4"/>
+        </svg>
+        <span class="logo-text">IRON <span>WHALE</span> DIGITAL</span>
+    </a>
+    <ul class="nav-links">
+        <li><a href="#services">Services</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#portfolio">Work</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="#contact" class="nav-cta">Start a Project</a>
+    <div class="nav-hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+    <canvas id="hills-canvas"></canvas>
+    <canvas id="particle-canvas"></canvas>
+    <div class="hero-gradient"></div>
+
+    <!-- Abstract Geometric Whale SVG -->
+    <svg class="hero-whale" viewBox="0 0 800 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Main body outline -->
+        <path d="M85 295 C85 295 130 175 265 155 C395 135 515 195 615 218 C695 235 750 252 768 262
+                 C768 262 728 278 685 258 C648 240 588 255 545 275
+                 C485 305 402 328 302 318 C222 310 162 308 122 328 Z"
+              fill="none" stroke="rgba(77,166,214,0.45)" stroke-width="1.5" stroke-linejoin="round"/>
+        <!-- Interior body curve -->
+        <path d="M155 278 C210 238 332 218 452 238 C548 254 628 268 685 258"
+              stroke="rgba(184,197,212,0.18)" stroke-width="1"/>
+        <!-- Underbelly -->
+        <path d="M122 328 C160 340 240 348 302 318" stroke="rgba(184,197,212,0.12)" stroke-width="1"/>
+        <!-- Left flipper -->
+        <path d="M285 288 L248 368 L305 338 Z"
+              fill="none" stroke="rgba(77,166,214,0.3)" stroke-width="1.5" stroke-linejoin="round"/>
+        <!-- Tail flukes left -->
+        <path d="M100 295 L48 242 L92 285 L58 336 Z"
+              fill="none" stroke="rgba(77,166,214,0.4)" stroke-width="1.5" stroke-linejoin="round"/>
+        <!-- Dorsal fin -->
+        <path d="M420 165 L400 195 L460 188 Z"
+              fill="none" stroke="rgba(77,166,214,0.25)" stroke-width="1.5" stroke-linejoin="round"/>
+        <!-- Eye -->
+        <circle cx="618" cy="246" r="9" fill="none" stroke="rgba(77,166,214,0.7)" stroke-width="1.5"/>
+        <circle cx="618" cy="246" r="3.5" fill="rgba(77,166,214,0.35)"/>
+        <circle cx="616" cy="244" r="1" fill="rgba(255,255,255,0.3)"/>
+        <!-- Rostrum -->
+        <path d="M685 258 L768 262 L725 280 Z"
+              fill="none" stroke="rgba(77,166,214,0.35)" stroke-width="1.5" stroke-linejoin="round"/>
+        <!-- Mouth line -->
+        <path d="M695 265 Q730 272 768 262" stroke="rgba(77,166,214,0.2)" stroke-width="1"/>
+        <!-- Body segment lines (ribs) -->
+        <path d="M360 158 L348 318" stroke="rgba(184,197,212,0.06)" stroke-width="1"/>
+        <path d="M460 178 L448 308" stroke="rgba(184,197,212,0.06)" stroke-width="1"/>
+        <path d="M560 210 L548 282" stroke="rgba(184,197,212,0.06)" stroke-width="1"/>
+        <!-- Barnacle/texture dots -->
+        <circle cx="430" cy="198" r="2.5" fill="rgba(184,197,212,0.18)"/>
+        <circle cx="468" cy="192" r="1.8" fill="rgba(184,197,212,0.18)"/>
+        <circle cx="400" cy="203" r="1.2" fill="rgba(184,197,212,0.15)"/>
+        <circle cx="510" cy="212" r="2" fill="rgba(184,197,212,0.14)"/>
+        <circle cx="380" cy="210" r="1.5" fill="rgba(184,197,212,0.12)"/>
+        <circle cx="540" cy="225" r="1.5" fill="rgba(184,197,212,0.12)"/>
+        <!-- Bioluminescent data lines -->
+        <line x1="410" y1="195" x2="390" y2="105" stroke="rgba(77,166,214,0.1)" stroke-width="1" stroke-dasharray="3,7"/>
+        <line x1="510" y1="215" x2="535" y2="118" stroke="rgba(77,166,214,0.08)" stroke-width="1" stroke-dasharray="3,7"/>
+        <line x1="610" y1="248" x2="660" y2="162" stroke="rgba(77,166,214,0.07)" stroke-width="1" stroke-dasharray="3,7"/>
+        <!-- Data node circles -->
+        <circle cx="390" cy="105" r="3" fill="none" stroke="rgba(77,166,214,0.2)" stroke-width="1"/>
+        <circle cx="535" cy="118" r="3" fill="none" stroke="rgba(77,166,214,0.18)" stroke-width="1"/>
+        <circle cx="660" cy="162" r="3" fill="none" stroke="rgba(77,166,214,0.15)" stroke-width="1"/>
+        <!-- Depth scan lines across body -->
+        <path d="M200 218 L710 244" stroke="rgba(77,166,214,0.04)" stroke-width="0.5"/>
+        <path d="M180 258 L725 268" stroke="rgba(77,166,214,0.04)" stroke-width="0.5"/>
+        <path d="M195 295 L688 272" stroke="rgba(77,166,214,0.04)" stroke-width="0.5"/>
+        <!-- Outer glow trace -->
+        <path d="M85 295 C85 295 130 175 265 155 C395 135 515 195 615 218 C695 235 750 252 768 262"
+              fill="none" stroke="rgba(77,166,214,0.08)" stroke-width="12"/>
+    </svg>
+
+    <div class="hero-content">
+        <p class="hero-eyebrow">// Web Development Agency</p>
+        <h1 class="hero-title">
+            RISE FROM
+            <span class="line-2">THE <span class="accent-word">DEEP</span></span>
+        </h1>
+        <p class="hero-sub">We forge powerful digital presences for brands that refuse to be ordinary. Strategy, design, and development — built to dominate.</p>
+        <div class="hero-actions">
+            <a href="#contact" class="btn-primary"><span>Start a Project</span></a>
+            <a href="#portfolio" class="btn-secondary">
+                View Our Work
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8H13M9 4L13 8L9 12" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <div class="hero-scroll">
+        <span class="scroll-text">Scroll</span>
+        <div class="scroll-line"></div>
+    </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+    <div class="section-header reveal">
+        <p class="section-label">What We Do</p>
+        <h2 class="section-title">CAPABILITIES</h2>
+    </div>
+    <div class="services-grid">
+        <div class="service-card reveal reveal-delay-1">
+            <div class="service-num">01</div>
+            <svg class="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="4" y="8" width="40" height="28" rx="1"/>
+                <path d="M16 44H32M24 36V44"/>
+                <path d="M13 22L19 16L25 22L35 14"/>
+            </svg>
+            <h3 class="service-name">Web Design</h3>
+            <p class="service-desc">Pixel-perfect interfaces that convert. From wireframe to final product, we craft digital experiences that captivate and perform.</p>
+        </div>
+        <div class="service-card reveal reveal-delay-2">
+            <div class="service-num">02</div>
+            <svg class="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+                <polyline points="16,20 8,24 16,28"/><polyline points="32,20 40,24 32,28"/>
+                <line x1="22" y1="32" x2="26" y2="16"/>
+            </svg>
+            <h3 class="service-name">Full-Stack Development</h3>
+            <p class="service-desc">Robust, scalable web applications built on modern stacks. React, Next.js, Node — we build for speed, security, and scale.</p>
+        </div>
+        <div class="service-card reveal reveal-delay-3">
+            <div class="service-num">03</div>
+            <svg class="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M6 36L18 20L28 28L36 16L44 22"/>
+                <path d="M4 44H44"/>
+                <circle cx="18" cy="20" r="2" fill="currentColor"/>
+                <circle cx="28" cy="28" r="2" fill="currentColor"/>
+                <circle cx="36" cy="16" r="2" fill="currentColor"/>
+            </svg>
+            <h3 class="service-name">E-Commerce</h3>
+            <p class="service-desc">High-converting online stores that sell around the clock. Shopify, WooCommerce, and custom-built solutions.</p>
+        </div>
+        <div class="service-card reveal reveal-delay-4">
+            <div class="service-num">04</div>
+            <svg class="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="24" cy="24" r="16"/>
+                <ellipse cx="24" cy="24" rx="8" ry="16"/>
+                <path d="M8 24H40M24 8C16 14 16 34 24 40M24 8C32 14 32 34 24 40"/>
+            </svg>
+            <h3 class="service-name">SEO & Performance</h3>
+            <p class="service-desc">Engineered to rank. Core Web Vitals optimization, technical SEO, and content strategy to dominate search results.</p>
+        </div>
+        <div class="service-card reveal reveal-delay-5">
+            <div class="service-num">05</div>
+            <svg class="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="8" y="8" width="14" height="14" rx="1"/>
+                <rect x="26" y="8" width="14" height="14" rx="1"/>
+                <rect x="8" y="26" width="14" height="14" rx="1"/>
+                <rect x="26" y="26" width="14" height="14" rx="1"/>
+            </svg>
+            <h3 class="service-name">Brand Identity</h3>
+            <p class="service-desc">Visual identities that command attention. Logo, typography, color systems, and brand guidelines built to last.</p>
+        </div>
+        <div class="service-card reveal reveal-delay-6">
+            <div class="service-num">06</div>
+            <svg class="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M6 32C6 32 14 18 24 18C34 18 42 32 42 32"/>
+                <path d="M2 24C2 24 10 10 24 10C38 10 46 24 46 24"/>
+                <circle cx="24" cy="24" r="5" fill="currentColor" opacity="0.4"/>
+            </svg>
+            <h3 class="service-name">Digital Strategy</h3>
+            <p class="service-desc">Data-driven strategy that connects every digital touchpoint. Growth roadmaps built to move the needle — measurably.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+    <div class="about-visual reveal">
+        <div class="about-frame">
+            <div class="about-corner"></div>
+            <svg class="depth-lines" viewBox="0 0 400 500" fill="none" preserveAspectRatio="xMidYMid slice">
+                <!-- Ocean depth line scan -->
+                <path d="M0 80 Q200 60 400 80"  stroke="rgba(77,166,214,0.08)" stroke-width="1"/>
+                <path d="M0 130 Q200 115 400 130" stroke="rgba(77,166,214,0.07)" stroke-width="1"/>
+                <path d="M0 180 Q200 168 400 180" stroke="rgba(77,166,214,0.07)" stroke-width="1"/>
+                <path d="M0 230 Q200 222 400 230" stroke="rgba(77,166,214,0.06)" stroke-width="1"/>
+                <path d="M0 280 Q200 275 400 280" stroke="rgba(77,166,214,0.05)" stroke-width="1"/>
+                <path d="M0 330 Q200 328 400 330" stroke="rgba(77,166,214,0.05)" stroke-width="1"/>
+                <path d="M0 380 Q200 380 400 380" stroke="rgba(77,166,214,0.04)" stroke-width="1"/>
+                <path d="M0 430 Q200 432 400 430" stroke="rgba(77,166,214,0.04)" stroke-width="1"/>
+                <!-- Vertical grid -->
+                <line x1="80"  y1="0" x2="80"  y2="500" stroke="rgba(184,197,212,0.04)" stroke-width="1"/>
+                <line x1="160" y1="0" x2="160" y2="500" stroke="rgba(184,197,212,0.04)" stroke-width="1"/>
+                <line x1="240" y1="0" x2="240" y2="500" stroke="rgba(184,197,212,0.04)" stroke-width="1"/>
+                <line x1="320" y1="0" x2="320" y2="500" stroke="rgba(184,197,212,0.04)" stroke-width="1"/>
+                <!-- Whale silhouette -->
+                <path d="M100 240 C100 240 135 210 165 205 C200 200 230 218 248 228
+                         C262 236 268 245 264 250 C255 245 235 248 215 258
+                         C190 270 162 278 140 272 C122 268 98 258 98 248 Z"
+                      fill="none" stroke="rgba(77,166,214,0.2)" stroke-width="1"/>
+                <circle cx="252" cy="230" r="5" fill="none" stroke="rgba(77,166,214,0.3)" stroke-width="1"/>
+                <!-- Data nodes -->
+                <circle cx="120" cy="155" r="2"   fill="rgba(77,166,214,0.25)"/>
+                <circle cx="290" cy="138" r="1.5" fill="rgba(77,166,214,0.22)"/>
+                <circle cx="360" cy="200" r="2"   fill="rgba(77,166,214,0.18)"/>
+                <circle cx="55"  cy="308" r="1.5" fill="rgba(77,166,214,0.18)"/>
+                <circle cx="340" cy="358" r="2"   fill="rgba(77,166,214,0.12)"/>
+            </svg>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);text-align:center;pointer-events:none;">
+                <div style="font-family:'Cinzel',serif;font-size:5.5rem;font-weight:900;color:rgba(77,166,214,0.07);line-height:1;letter-spacing:0.08em;">IWD</div>
+                <div style="font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:0.5em;color:rgba(184,197,212,0.15);text-transform:uppercase;margin-top:0.8rem;">IRON WHALE DIGITAL</div>
+            </div>
+        </div>
+        <div class="about-stat-block">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Client Satisfaction</div>
+        </div>
+    </div>
+
+    <div class="about-content">
+        <p class="section-label reveal">About Us</p>
+        <h2 class="section-title reveal reveal-delay-1">WE BUILD<br>DIGITAL<br>EMPIRES</h2>
+        <blockquote class="about-quote reveal reveal-delay-2">
+            "The deepest waters hold the most power. We bring that force to your brand."
+        </blockquote>
+        <p class="about-body reveal reveal-delay-3">Iron Whale Digital is a boutique web development agency built for founders and brands who refuse mediocrity. We don't do templates. We don't do generic. We engineer digital experiences that command attention and convert visitors into customers.</p>
+        <p class="about-body reveal reveal-delay-4">From concept to deployment, every pixel and every line of code is crafted with intention. We combine strategic thinking with technical excellence to deliver results that matter.</p>
+        <div class="about-metrics reveal reveal-delay-5">
+            <div>
+                <div class="metric-value">50+</div>
+                <div class="metric-label">Projects Delivered</div>
+            </div>
+            <div>
+                <div class="metric-value">3×</div>
+                <div class="metric-label">Avg. Conv. Lift</div>
+            </div>
+            <div>
+                <div class="metric-value">48H</div>
+                <div class="metric-label">Response Time</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+    <div class="portfolio-header">
+        <div>
+            <p class="section-label reveal">Selected Work</p>
+            <h2 class="section-title reveal reveal-delay-1">RECENT<br>PROJECTS</h2>
+        </div>
+        <a href="#contact" class="btn-secondary reveal reveal-delay-2" style="margin-bottom:0.5rem;">
+            Start Your Project
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8H13M9 4L13 8L9 12" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+        </a>
+    </div>
+
+    <div class="portfolio-grid">
+        <!-- Project 1 -->
+        <div class="project-card reveal reveal-delay-1">
+            <div class="project-bg">
+                <div class="project-visual pv-1">
+                    <svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 600 330" fill="none" preserveAspectRatio="xMidYMid slice">
+                        <path d="M0 165L100 140L200 160L300 130L400 155L500 135L600 150" stroke="rgba(77,166,214,0.15)" stroke-width="1.5"/>
+                        <path d="M0 185L100 168L200 185L300 158L400 172L500 155L600 168" stroke="rgba(77,166,214,0.08)" stroke-width="1"/>
+                        <circle cx="300" cy="130" r="45" fill="none" stroke="rgba(77,166,214,0.08)" stroke-width="1"/>
+                        <circle cx="300" cy="130" r="68" fill="none" stroke="rgba(77,166,214,0.05)" stroke-width="1"/>
+                        <text x="40" y="88" font-family="'Bebas Neue'" font-size="90" fill="rgba(184,197,212,0.04)" letter-spacing="5">APEX</text>
+                        <rect x="40" y="220" width="160" height="60" fill="none" stroke="rgba(184,197,212,0.06)" stroke-width="1"/>
+                        <rect x="220" y="230" width="100" height="15" fill="rgba(77,166,214,0.06)"/>
+                        <rect x="220" y="255" width="70" height="10" fill="rgba(184,197,212,0.04)"/>
+                    </svg>
+                </div>
+                <div class="project-overlay">
+                    <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+                        <circle cx="22" cy="22" r="21" stroke="rgba(77,166,214,0.9)" stroke-width="1"/>
+                        <path d="M16 22H28M24 18L28 22L24 26" stroke="rgba(77,166,214,0.9)" stroke-width="1.5"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="project-info">
+                <div class="project-tag">E-Commerce · Shopify</div>
+                <div class="project-name">Apex Athletics Online Store</div>
+            </div>
+        </div>
+
+        <!-- Project 2 -->
+        <div class="project-card reveal reveal-delay-2">
+            <div class="project-bg">
+                <div class="project-visual pv-2">
+                    <svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 400 220" fill="none" preserveAspectRatio="xMidYMid slice">
+                        <rect x="40" y="40" width="320" height="140" fill="none" stroke="rgba(184,197,212,0.07)" stroke-width="1"/>
+                        <rect x="60" y="60" width="120" height="80"  fill="rgba(77,166,214,0.04)"  stroke="rgba(77,166,214,0.15)" stroke-width="1"/>
+                        <rect x="200" y="60" width="140" height="35" fill="rgba(184,197,212,0.03)" stroke="rgba(184,197,212,0.1)" stroke-width="1"/>
+                        <rect x="200" y="105" width="140" height="35" fill="rgba(184,197,212,0.03)" stroke="rgba(184,197,212,0.1)" stroke-width="1"/>
+                        <text x="200" y="170" font-family="'Space Mono'" font-size="10" fill="rgba(77,166,214,0.22)">BRAND IDENTITY</text>
+                        <line x1="60" y1="150" x2="180" y2="150" stroke="rgba(77,166,214,0.08)" stroke-width="1"/>
+                    </svg>
+                </div>
+                <div class="project-overlay">
+                    <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+                        <circle cx="22" cy="22" r="21" stroke="rgba(77,166,214,0.9)" stroke-width="1"/>
+                        <path d="M16 22H28M24 18L28 22L24 26" stroke="rgba(77,166,214,0.9)" stroke-width="1.5"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="project-info">
+                <div class="project-tag">Brand Identity · Web</div>
+                <div class="project-name">Meridian Capital Partners</div>
+            </div>
+        </div>
+
+        <!-- Project 3 -->
+        <div class="project-card reveal reveal-delay-3">
+            <div class="project-bg">
+                <div class="project-visual pv-3">
+                    <svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 350 315" fill="none" preserveAspectRatio="xMidYMid slice">
+                        <circle cx="175" cy="158" r="85" fill="none" stroke="rgba(77,166,214,0.09)" stroke-width="1"/>
+                        <circle cx="175" cy="158" r="55" fill="none" stroke="rgba(77,166,214,0.12)" stroke-width="1"/>
+                        <circle cx="175" cy="158" r="22" fill="rgba(77,166,214,0.04)" stroke="rgba(77,166,214,0.22)" stroke-width="1"/>
+                        <path d="M175 73V243M90 158H260" stroke="rgba(184,197,212,0.05)" stroke-width="0.5"/>
+                        <path d="M175 103L210 138L175 173L140 138Z" fill="none" stroke="rgba(77,166,214,0.12)" stroke-width="1"/>
+                        <text x="128" y="268" font-family="'Space Mono'" font-size="9" fill="rgba(77,166,214,0.2)">ORBIT ANALYTICS</text>
+                    </svg>
+                </div>
+                <div class="project-overlay">
+                    <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+                        <circle cx="22" cy="22" r="21" stroke="rgba(77,166,214,0.9)" stroke-width="1"/>
+                        <path d="M16 22H28M24 18L28 22L24 26" stroke="rgba(77,166,214,0.9)" stroke-width="1.5"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="project-info">
+                <div class="project-tag">SaaS · React · Node</div>
+                <div class="project-name">Orbit Analytics Platform</div>
+            </div>
+        </div>
+
+        <!-- Project 4 -->
+        <div class="project-card reveal reveal-delay-4">
+            <div class="project-bg">
+                <div class="project-visual pv-4">
+                    <svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 600 540" fill="none" preserveAspectRatio="xMidYMid slice">
+                        <path d="M0 270C100 248 200 292 300 270C400 248 500 292 600 270" stroke="rgba(77,166,214,0.1)" stroke-width="1.5"/>
+                        <path d="M0 295C100 273 200 317 300 295C400 273 500 317 600 295" stroke="rgba(77,166,214,0.07)" stroke-width="1"/>
+                        <text x="80" y="226" font-family="'Cinzel'" font-size="56" fill="rgba(184,197,212,0.04)" font-weight="900">TERRA</text>
+                        <rect x="80"  y="248" width="200" height="130" fill="none" stroke="rgba(184,197,212,0.06)" stroke-width="1"/>
+                        <rect x="300" y="228" width="220" height="85"  fill="none" stroke="rgba(77,166,214,0.08)" stroke-width="1"/>
+                        <rect x="300" y="325" width="100" height="50"  fill="none" stroke="rgba(184,197,212,0.05)" stroke-width="1"/>
+                        <line x1="80" y1="378" x2="520" y2="378" stroke="rgba(184,197,212,0.04)" stroke-width="0.5"/>
+                    </svg>
+                </div>
+                <div class="project-overlay">
+                    <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+                        <circle cx="22" cy="22" r="21" stroke="rgba(77,166,214,0.9)" stroke-width="1"/>
+                        <path d="M16 22H28M24 18L28 22L24 26" stroke="rgba(77,166,214,0.9)" stroke-width="1.5"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="project-info">
+                <div class="project-tag">Real Estate · Next.js</div>
+                <div class="project-name">Terra Property Group</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+    <div class="contact-bg-text">IWD</div>
+    <div class="contact-grid">
+        <div>
+            <p class="section-label reveal">Get In Touch</p>
+            <h2 class="section-title reveal reveal-delay-1">LET'S BUILD<br>SOMETHING<br>POWERFUL</h2>
+            <p class="contact-intro reveal reveal-delay-2">Ready to rise from the digital depths? Tell us about your project and let's create something extraordinary together.</p>
+
+            <div class="contact-detail reveal reveal-delay-3">
+                <div class="contact-detail-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="contact-detail-label">Email</div>
+                    <div class="contact-detail-text">hello@ironwhaledigital.com</div>
+                </div>
+            </div>
+            <div class="contact-detail reveal reveal-delay-4">
+                <div class="contact-detail-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.21 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="contact-detail-label">Phone</div>
+                    <div class="contact-detail-text">+1 (555) 000-0000</div>
+                </div>
+            </div>
+            <div class="contact-detail reveal reveal-delay-5">
+                <div class="contact-detail-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="contact-detail-label">Website</div>
+                    <div class="contact-detail-text">www.ironwhaledigital.com</div>
+                </div>
+            </div>
+        </div>
+
+        <form class="contact-form reveal reveal-delay-2" onsubmit="handleSubmit(event)">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" placeholder="John" required>
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" placeholder="Doe" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" placeholder="john@company.com" required>
+            </div>
+            <div class="form-group">
+                <label>Project Type</label>
+                <select>
+                    <option value="" disabled selected>Select service type</option>
+                    <option>Website Design &amp; Development</option>
+                    <option>E-Commerce Store</option>
+                    <option>Brand Identity</option>
+                    <option>Full-Stack Application</option>
+                    <option>SEO &amp; Performance</option>
+                    <option>Digital Strategy</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tell Us About Your Project</label>
+                <textarea placeholder="Describe your vision, goals, and timeline..." required></textarea>
+            </div>
+            <button type="submit" class="btn-submit"><span>Send Message →</span></button>
+        </form>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-logo">IRON <span>WHALE</span> DIGITAL</div>
+    <p class="footer-copy">© 2026 Iron Whale Digital. All rights reserved.</p>
+    <ul class="footer-links">
+        <li><a href="#services">Services</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#portfolio">Work</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+</footer>
+
+<script>
+// ===================== PARTICLE CANVAS =====================
+(function () {
+    const canvas = document.getElementById('particle-canvas');
+    const ctx    = canvas.getContext('2d');
+    let W, H, particles;
+    const COUNT = 75, LINK_DIST = 110;
+
+    function resize() {
+        W = canvas.width  = canvas.offsetWidth;
+        H = canvas.height = canvas.offsetHeight;
+    }
+
+    class Particle {
+        constructor(init) {
+            this.x  = Math.random() * (init ? W : W);
+            this.y  = init ? Math.random() * H : -8;
+            this.vx = (Math.random() - 0.5) * 0.25;
+            this.vy = Math.random() * 0.18 + 0.04;
+            this.r  = Math.random() * 1.4 + 0.4;
+            this.a  = Math.random() * 0.45 + 0.15;
+            this.t  = Math.random() * Math.PI * 2;
+            this.ts = Math.random() * 0.018 + 0.004;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.t += this.ts;
+            if (this.y > H + 10) { this.x = Math.random() * W; this.y = -8; }
+            if (this.x < -10 || this.x > W + 10) this.x = ((this.x + W) % W);
+        }
+        draw() {
+            const a = this.a * (0.65 + 0.35 * Math.sin(this.t));
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(77,166,214,${a})`;
+            ctx.fill();
+        }
+    }
+
+    function links() {
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const d  = Math.sqrt(dx * dx + dy * dy);
+                if (d < LINK_DIST) {
+                    const a = (1 - d / LINK_DIST) * 0.12;
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.strokeStyle = `rgba(184,197,212,${a})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                }
+            }
+        }
+    }
+
+    function loop() {
+        ctx.clearRect(0, 0, W, H);
+        links();
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(loop);
+    }
+
+    resize();
+    particles = Array.from({ length: COUNT }, (_, i) => new Particle(true));
+    window.addEventListener('resize', resize);
+    loop();
+})();
+
+// ===================== NAV SCROLL =====================
+const mainNav = document.getElementById('main-nav');
+window.addEventListener('scroll', () => {
+    mainNav.classList.toggle('scrolled', window.scrollY > 60);
+}, { passive: true });
+
+// ===================== SCROLL REVEAL =====================
+const revealEls = document.querySelectorAll('.reveal');
+const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+revealEls.forEach(el => revealObs.observe(el));
+
+// ===================== CONTACT FORM =====================
+function handleSubmit(e) {
+    e.preventDefault();
+    const span = e.target.querySelector('.btn-submit span');
+    const btn  = e.target.querySelector('.btn-submit');
+    span.textContent = 'Message Sent ✓';
+    btn.style.borderColor = 'rgba(77,166,214,0.9)';
+    btn.style.color = 'rgba(77,166,214,0.9)';
+    setTimeout(() => {
+        span.textContent = 'Send Message →';
+        btn.style.borderColor = '';
+        btn.style.color = '';
+        e.target.reset();
+    }, 3200);
+}
+
+// ===================== MOBILE NAV =====================
+document.getElementById('hamburger').addEventListener('click', function () {
+    const links = document.querySelector('.nav-links');
+    const open  = links.style.display === 'flex';
+    links.style.cssText = open ? '' : [
+        'display:flex', 'flex-direction:column', 'position:fixed',
+        'top:58px', 'left:0', 'right:0',
+        'background:rgba(4,8,15,0.98)', 'backdrop-filter:blur(20px)',
+        'padding:2rem', 'gap:1.8rem', 'z-index:99',
+        'border-bottom:1px solid rgba(77,166,214,0.2)'
+    ].join(';');
+});
+document.querySelectorAll('.nav-links a').forEach(a => {
+    a.addEventListener('click', () => {
+        if (window.innerWidth < 768) document.querySelector('.nav-links').style.cssText = '';
+    });
+});
+
+// ===================== GLSL HILLS =====================
+(function () {
+    if (typeof THREE === 'undefined') return;
+    const canvas = document.getElementById('hills-canvas');
+    if (!canvas) return;
+
+    const SPEED      = 0.5;
+    const PLANE_SIZE = 256;
+    const CAMERA_Z   = 125;
+
+    const uniforms = { time: { type: 'f', value: 0 } };
+
+    const vertexShader = `
+        #define GLSLIFY 1
+        attribute vec3 position;
+        uniform mat4 projectionMatrix;
+        uniform mat4 modelViewMatrix;
+        uniform float time;
+        varying vec3 vPosition;
+
+        mat4 rotateMatrixX(float radian) {
+            return mat4(
+                1.0, 0.0, 0.0, 0.0,
+                0.0, cos(radian), -sin(radian), 0.0,
+                0.0, sin(radian),  cos(radian), 0.0,
+                0.0, 0.0, 0.0, 1.0
+            );
+        }
+
+        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
+        vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+        vec3 fade(vec3 t) { return t*t*t*(t*(t*6.0-15.0)+10.0); }
+
+        float cnoise(vec3 P) {
+            vec3 Pi0 = floor(P); vec3 Pi1 = Pi0 + vec3(1.0);
+            Pi0 = mod289(Pi0); Pi1 = mod289(Pi1);
+            vec3 Pf0 = fract(P); vec3 Pf1 = Pf0 - vec3(1.0);
+            vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+            vec4 iy = vec4(Pi0.yy, Pi1.yy);
+            vec4 iz0 = Pi0.zzzz; vec4 iz1 = Pi1.zzzz;
+            vec4 ixy  = permute(permute(ix) + iy);
+            vec4 ixy0 = permute(ixy + iz0);
+            vec4 ixy1 = permute(ixy + iz1);
+            vec4 gx0 = ixy0 * (1.0 / 7.0);
+            vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
+            gx0 = fract(gx0);
+            vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
+            vec4 sz0 = step(gz0, vec4(0.0));
+            gx0 -= sz0 * (step(0.0, gx0) - 0.5);
+            gy0 -= sz0 * (step(0.0, gy0) - 0.5);
+            vec4 gx1 = ixy1 * (1.0 / 7.0);
+            vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
+            gx1 = fract(gx1);
+            vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
+            vec4 sz1 = step(gz1, vec4(0.0));
+            gx1 -= sz1 * (step(0.0, gx1) - 0.5);
+            gy1 -= sz1 * (step(0.0, gy1) - 0.5);
+            vec3 g000 = vec3(gx0.x,gy0.x,gz0.x); vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
+            vec3 g010 = vec3(gx0.z,gy0.z,gz0.z); vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
+            vec3 g001 = vec3(gx1.x,gy1.x,gz1.x); vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
+            vec3 g011 = vec3(gx1.z,gy1.z,gz1.z); vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
+            vec4 norm0 = taylorInvSqrt(vec4(dot(g000,g000),dot(g010,g010),dot(g100,g100),dot(g110,g110)));
+            g000 *= norm0.x; g010 *= norm0.y; g100 *= norm0.z; g110 *= norm0.w;
+            vec4 norm1 = taylorInvSqrt(vec4(dot(g001,g001),dot(g011,g011),dot(g101,g101),dot(g111,g111)));
+            g001 *= norm1.x; g011 *= norm1.y; g101 *= norm1.z; g111 *= norm1.w;
+            float n000 = dot(g000, Pf0);
+            float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
+            float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
+            float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
+            float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
+            float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
+            float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
+            float n111 = dot(g111, Pf1);
+            vec3 fade_xyz = fade(Pf0);
+            vec4 n_z  = mix(vec4(n000,n100,n010,n110), vec4(n001,n101,n011,n111), fade_xyz.z);
+            vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
+            float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);
+            return 2.2 * n_xyz;
+        }
+
+        void main(void) {
+            vec3 updatePosition = (rotateMatrixX(radians(90.0)) * vec4(position, 1.0)).xyz;
+            float sin1 = sin(radians(updatePosition.x / 128.0 * 90.0));
+            vec3 noisePosition = updatePosition + vec3(0.0, 0.0, time * -30.0);
+            float noise1 = cnoise(noisePosition * 0.08);
+            float noise2 = cnoise(noisePosition * 0.06);
+            float noise3 = cnoise(noisePosition * 0.4);
+            vec3 lastPosition = updatePosition + vec3(0.0,
+                noise1 * sin1 * 8.0
+                + noise2 * sin1 * 8.0
+                + noise3 * (abs(sin1) * 2.0 + 0.5)
+                + pow(sin1, 2.0) * 40.0, 0.0);
+            vPosition = lastPosition;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(lastPosition, 1.0);
+        }
+    `;
+
+    const fragmentShader = `
+        precision highp float;
+        #define GLSLIFY 1
+        varying vec3 vPosition;
+        void main(void) {
+            float opacity = (96.0 - length(vPosition)) / 256.0 * 0.6;
+            vec3 color = vec3(0.6);
+            gl_FragColor = vec4(color, opacity);
+        }
+    `;
+
+    const mesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE, PLANE_SIZE, PLANE_SIZE),
+        new THREE.RawShaderMaterial({ uniforms, vertexShader, fragmentShader, transparent: true })
+    );
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+    const scene    = new THREE.Scene();
+    const camera   = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+    const clock    = new THREE.Clock();
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000, 1);
+    camera.position.set(0, 16, CAMERA_Z);
+    camera.lookAt(new THREE.Vector3(0, 28, 0));
+    scene.add(mesh);
+
+    window.addEventListener('resize', function () {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }, { passive: true });
+
+    (function loop() {
+        uniforms.time.value += clock.getDelta() * SPEED;
+        renderer.render(scene, camera);
+        requestAnimationFrame(loop);
+    })();
+})();
+
+</script>
+</body>
+</html>
